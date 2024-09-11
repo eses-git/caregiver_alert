@@ -14,6 +14,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class AppDataBase {
   late final Database _database;
 
+  // Singleton instance
+  static final AppDataBase _instance = AppDataBase._internal();
+  factory AppDataBase() => _instance;
+  AppDataBase._internal();
+
+
+
   Future<void> init() async {
     WidgetsFlutterBinding.ensureInitialized();
     final String databasePath = await getDatabasesPath();
@@ -250,17 +257,18 @@ class AppDataBase {
     final appId = await secureStorage.read(key: 'appId');
     final userId = await secureStorage.read(key: 'userId');
 
+    final isVoiceRecognition = await  secureStorage.write(key: 'isVoiceRecognition', value : 'false');
+    final isLocationPermission = await  secureStorage.write(key: 'isLocationPermission', value : 'false');
+    final isRecordingPermission = await  secureStorage.write(key: 'isRecordingPermission',value : 'false');
+    final viaWhatsApp = await  secureStorage.write(key: 'viaWhatsApp', value : 'false');
+    final viaSMS = await  secureStorage.write(key: 'viaSMS', value : 'false');
+    final viaTelegram = await  secureStorage.write(key: 'viaTelegram', value : 'false');
+    final viaAPP = await  secureStorage.write(key: 'viaAPP', value : 'false');
+
     final settings = AppSettings(
         id: 1,
         appUserId: '$userId',
         appAppId: '$appId',
-        isVoiceRecognition: 0,
-        isLocationPermission: 0,
-        isRecordingPermission: 0,
-        viaWhatsApp: 0,
-        viaSMS: 0,
-        viaTelegram: 0,
-        viaAPP: 0,
         lastUpdate: DateTime.now(),
         voiceCmdActivate: '',
         voiceCmdCancel: '',
@@ -269,6 +277,5 @@ class AppDataBase {
     print(" Data insered into Alert settings");
 
   }
-
 
 }
