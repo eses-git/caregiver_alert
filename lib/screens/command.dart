@@ -4,6 +4,7 @@ import '../fn/voice_command.dart';
 import '../fn/voice_recognition.dart';
 import 'settings.dart'; // Import the settings screen
 import '../classes/settings.dart';
+//import 'package:voice_authentication/voice_authentication.dart'; // Import the voice authentication package
 
 class CommandsScreen extends StatefulWidget {
   @override
@@ -43,14 +44,6 @@ class _CommandsScreenState extends State<CommandsScreen> {
       setState(() => _isListening = false);
     }
   }
-  // Asynchronous method to load settings
-  Future<void> _loadSettings() async {
-    await settings.loadSettings();
-    setState(() {
-      _isVoiceRecognition = settings.isVoiceRecognition;
-
-    });
-  }
 
   void _stopListening() {
     _speech.stop();
@@ -78,6 +71,8 @@ class _CommandsScreenState extends State<CommandsScreen> {
     } else {
       setState(() => _isListeningForCancel = false);
     }
+    print("command cancel voice: $_commandText");
+    setVoiceCmdCancel(_commandText);
   }
 
   void _stopListeningForCancel() {
@@ -120,6 +115,10 @@ class _CommandsScreenState extends State<CommandsScreen> {
                   _isVoiceRecognition = newValueVoice;
                 });
                 await allowVoiceRecognition(newValueVoice);
+                if (newValueVoice) {
+                  // Add user to permitted list using voice authentication
+              //    await VoiceAuthentication().addUserToPermittedList();
+                }
               },
             ),
             SizedBox(height: 20),
