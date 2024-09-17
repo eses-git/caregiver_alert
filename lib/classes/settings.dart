@@ -8,7 +8,8 @@ class Settings {
   bool viaSMS = false;
   bool viaTelegram = false;
   bool viaAPP = false;
-
+  String voiceCmdActivate="";
+  String voiceCmdCancel="";
   // Secure Storage instance
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
@@ -29,6 +30,20 @@ class Settings {
     isLocationPermission = value;
     print("isLocationPermission after update: $isLocationPermission");
   }
+
+  // Function to update and save the location permission setting
+  Future<void> setVoiceCmdActivate(String value) async {
+    await secureStorage.write(key: 'voiceCmdActivate', value: '$value');
+    voiceCmdActivate = value;
+    print("Voice command: $voiceCmdActivate");
+  }
+  // Function to update and save the location permission setting
+  Future<void> setVoiceCmdCancel(String value) async {
+    await secureStorage.write(key: 'voiceCmdCancel', value: '$value');
+    voiceCmdCancel = value;
+    print("Voice command: $voiceCmdCancel");
+  }
+
 
   // Similar functions can be added for other settings
   Future<void> setIsVoiceRecognition(bool value) async {

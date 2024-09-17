@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import '../fn/location.dart';
 import '../fn/sms.dart';
-import '../fn/voice_recognition.dart'; // Adjust import if not needed
 import '../classes/settings.dart';
 import '../fn/recording.dart';
 import '../fn/whatsapp.dart';
 import '../fn/telegram.dart';
 import '../fn/app.dart';
+import '../fn/voice_command.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'command.dart'; // Import the commands screen
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -17,17 +19,22 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final Settings settings = Settings();
   bool _isLocation = false;
-  bool _isVoiceRecognition =false;
-  bool _isRecordingPermission =false;
+  bool _isRecordingPermission = false;
   bool _viaWhatsApp = false;
   bool _viaSMS = false;
   bool _viaTelegram = false;
-  bool _viaAPP =false;
+  bool _viaAPP = false;
+
+  // For speech recognition
+  stt.SpeechToText _speech = stt.SpeechToText(); // Initialize here
+  bool _isListening = false;
+  String _commandText = '';
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
+    _speech = stt.SpeechToText();
   }
 
   // Asynchronous method to load settings
@@ -35,7 +42,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await settings.loadSettings();
     setState(() {
       _isLocation = settings.isLocationPermission;
-      _isVoiceRecognition = settings.isVoiceRecognition;
       _isRecordingPermission = settings.isRecordingPermission;
       _viaWhatsApp = settings.viaWhatsApp;
       _viaSMS = settings.viaSMS;
@@ -43,6 +49,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _viaAPP = settings.viaAPP;
     });
   }
+
+  void _handleCommand(String command) {
+    if (command.contains('location')) {
+      setState(() {
+        _isLocation = !_isLocation;
+      });
+      allowLocation(context, _isLocation);
+    }  else if (command.contains('recording')) {
+      setState(() {
+        _isRecordingPermission = !_isRecordingPermission;
+      });
+      allowVoiceRecording(context, _isRecordingPermission);
+    } else if (command.contains('WhatsApp')) {
+      setState(() {
+        _viaWhatsApp = !_viaWhatsApp;
+      });
+      allowWhatsApp(_viaWhatsApp);
+    } else if (command.contains('SMS')) {
+      setState(() {
+        _viaSMS = !_viaSMS;
+      });
+      allowSMS(_viaSMS);
+    } else if (command.contains('Telegram')) {
+      setState(() {
+        _viaTelegram = !_viaTelegram;
+      });
+      allowTelegram(_viaTelegram);
+    } else if (command.contains('app')) {
+      setState(() {
+        _viaAPP = !_viaAPP;
+      });
+      allowAPP(_viaAPP);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,31 +99,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'My Awesome App Settings',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20), // Add some spacing
-
-
+            SizedBox(height: 20),
             SwitchListTile(
-            title: Text('Allow location'),
-            value: _isLocation,
-            onChanged: (newValueLocalization) async {
-            setState(() {
-              _isLocation = newValueLocalization;
-            });
-                // Update the setting in secure storage
+              title: Text('Allow location'),
+              value: _isLocation,
+              onChanged: (newValueLocalization) async {
+                setState(() {
+                  _isLocation = newValueLocalization;
+                });
                 await allowLocation(context, newValueLocalization);
               },
             ),
-            SwitchListTile(
-              title: Text('Allow voice recogition'),
-              value: _isVoiceRecognition,
-              onChanged: (newValueVoice) async {
-                setState(() {
-                  _isVoiceRecognition = newValueVoice;
-                });
-                // Update the setting in secure storage
-                await allowVoiceRecognition(newValueVoice);
-              },
-            ),
+
             SwitchListTile(
               title: Text('Allow recording'),
               value: _isRecordingPermission,
@@ -90,7 +118,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 setState(() {
                   _isRecordingPermission = newValueRecording;
                 });
-                // Update the setting in secure storage
                 await allowVoiceRecording(context, newValueRecording);
               },
             ),
@@ -101,7 +128,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 setState(() {
                   _viaWhatsApp = newViaWhatsApp;
                 });
-                // Update the setting in secure storage
                 await allowWhatsApp(newViaWhatsApp);
               },
             ),
@@ -112,7 +138,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 setState(() {
                   _viaSMS = newViaSMS;
                 });
-                // Update the setting in secure storage
                 await allowSMS(newViaSMS);
               },
             ),
@@ -123,7 +148,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 setState(() {
                   _viaTelegram = newViaTelegram;
                 });
-                // Update the setting in secure storage
                 await allowTelegram(newViaTelegram);
               },
             ),
@@ -134,9 +158,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 setState(() {
                   _viaAPP = newViaAPP;
                 });
-                // Update the setting in secure storage
                 await allowAPP(newViaAPP);
               },
+            ),
+            SizedBox(height: 20),
+
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CommandsScreen()),
+                );
+              },
+              child: Text('Go to Commands'),
             ),
           ],
         ),
