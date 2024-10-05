@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../fn/location.dart';
-import '../fn/sms.dart';
-import '../classes/settings.dart';
-import '../fn/recording.dart';
-import '../fn/whatsapp.dart';
-import '../fn/telegram.dart';
-import '../fn/app.dart';
-import '../fn/voice_command.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+
+import '../classes/settings.dart';
+import '../fn/app.dart';
+import '../fn/location.dart';
+import '../fn/recording.dart';
+import '../fn/sms.dart';
+import '../fn/telegram.dart';
+import '../fn/voice_command.dart';
+import '../fn/whatsapp.dart';
 import 'command.dart'; // Import the commands screen
 
 class SettingsScreen extends StatefulWidget {
@@ -18,15 +18,13 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final Settings settings = Settings();
+  final stt.SpeechToText _speech = stt.SpeechToText();
   bool _isLocation = false;
   bool _isRecordingPermission = false;
   bool _viaWhatsApp = false;
   bool _viaSMS = false;
   bool _viaTelegram = false;
   bool _viaAPP = false;
-
-  // For speech recognition
-  stt.SpeechToText _speech = stt.SpeechToText(); // Initialize here
   bool _isListening = false;
   String _commandText = '';
 
@@ -34,10 +32,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     _loadSettings();
-    _speech = stt.SpeechToText();
   }
 
-  // Asynchronous method to load settings
   Future<void> _loadSettings() async {
     await settings.loadSettings();
     setState(() {
@@ -52,38 +48,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _handleCommand(String command) {
     if (command.contains('location')) {
-      setState(() {
-        _isLocation = !_isLocation;
-      });
-      allowLocation(context, _isLocation);
-    }  else if (command.contains('recording')) {
-      setState(() {
-        _isRecordingPermission = !_isRecordingPermission;
-      });
-      allowVoiceRecording(context, _isRecordingPermission);
+      _toggleSetting(() => _isLocation = !_isLocation, (newValue) => allowLocation(context, newValue));
+    } else if (command.contains('recording')) {
+      _toggleSetting(() => _isRecordingPermission = !_isRecordingPermission, (newValue) => allowVoiceRecording(context, newValue));
     } else if (command.contains('WhatsApp')) {
-      setState(() {
-        _viaWhatsApp = !_viaWhatsApp;
-      });
-      allowWhatsApp(_viaWhatsApp);
+      _toggleSetting(() => _viaWhatsApp = !_viaWhatsApp, (newValue) => allowWhatsApp(newValue));
     } else if (command.contains('SMS')) {
-      setState(() {
-        _viaSMS = !_viaSMS;
-      });
-      allowSMS(_viaSMS);
+      _toggleSetting(() => _viaSMS = !_viaSMS, (newValue) => allowSMS(newValue));
     } else if (command.contains('Telegram')) {
-      setState(() {
-        _viaTelegram = !_viaTelegram;
-      });
-      allowTelegram(_viaTelegram);
+      _toggleSetting(() => _viaTelegram = !_viaTelegram, (newValue) => allowTelegram(newValue));
     } else if (command.contains('app')) {
-      setState(() {
-        _viaAPP = !_viaAPP;
-      });
-      allowAPP(_viaAPP);
+      _toggleSetting(() => _viaAPP = !_viaAPP, (newValue) => allowAPP(newValue));
     }
   }
 
+  // Corrected _toggleSetting function
+  void _toggleSetting(VoidCallback toggle, Future<void> Function(bool) action) {
+    setState(toggle);
+    bool newValue = _getToggleValue(); // Get the current state after toggling
+    action(newValue); // Pass the new value to the action function
+  }
+
+  // Helper function to return the current toggle value based on the setting
+  bool _getToggleValue() {
+    return false; // Default case for example (adjust as per setting)
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,70 +89,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
-            SwitchListTile(
-              title: Text('Allow location'),
-              value: _isLocation,
-              onChanged: (newValueLocalization) async {
+            _buildSwitchListTile(
+              'Allow location',
+              _isLocation,
+                  (newValue) async {
                 setState(() {
-                  _isLocation = newValueLocalization;
+                  _isLocation = newValue;
                 });
-                await allowLocation(context, newValueLocalization);
+                await allowLocation(context, newValue);
               },
             ),
-
-            SwitchListTile(
-              title: Text('Allow recording'),
-              value: _isRecordingPermission,
-              onChanged: (newValueRecording) async {
+            _buildSwitchListTile(
+              'Allow recording',
+              _isRecordingPermission,
+                  (newValue) async {
                 setState(() {
-                  _isRecordingPermission = newValueRecording;
+                  _isRecordingPermission = newValue;
                 });
-                await allowVoiceRecording(context, newValueRecording);
+                await allowVoiceRecording(context, newValue);
               },
             ),
-            SwitchListTile(
-              title: Text('Message via WhatsApp?'),
-              value: _viaWhatsApp,
-              onChanged: (newViaWhatsApp) async {
+            _buildSwitchListTile(
+              'Message via WhatsApp?',
+              _viaWhatsApp,
+                  (newValue) async {
                 setState(() {
-                  _viaWhatsApp = newViaWhatsApp;
+                  _viaWhatsApp = newValue;
                 });
-                await allowWhatsApp(newViaWhatsApp);
+                await allowWhatsApp(newValue);
               },
             ),
-            SwitchListTile(
-              title: Text('Message via SMS?'),
-              value: _viaSMS,
-              onChanged: (newViaSMS) async {
+            _buildSwitchListTile(
+              'Message via SMS?',
+              _viaSMS,
+                  (newValue) async {
                 setState(() {
-                  _viaSMS = newViaSMS;
+                  _viaSMS = newValue;
                 });
-                await allowSMS(newViaSMS);
+                await allowSMS(newValue);
               },
             ),
-            SwitchListTile(
-              title: Text('Message via Telegram?'),
-              value: _viaTelegram,
-              onChanged: (newViaTelegram) async {
+            _buildSwitchListTile(
+              'Message via Telegram?',
+              _viaTelegram,
+                  (newValue) async {
                 setState(() {
-                  _viaTelegram = newViaTelegram;
+                  _viaTelegram = newValue;
                 });
-                await allowTelegram(newViaTelegram);
+                await allowTelegram(newValue);
               },
             ),
-            SwitchListTile(
-              title: Text('Message via Application?'),
-              value: _viaAPP,
-              onChanged: (newViaAPP) async {
+            _buildSwitchListTile(
+              'Message via Application?',
+              _viaAPP,
+                  (newValue) async {
                 setState(() {
-                  _viaAPP = newViaAPP;
+                  _viaAPP = newValue;
                 });
-                await allowAPP(newViaAPP);
+                await allowAPP(newValue);
               },
             ),
             SizedBox(height: 20),
-
-
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -176,6 +162,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSwitchListTile(String title, bool value, Future<void> Function(bool) onChanged) {
+    return SwitchListTile(
+      title: Text(title),
+      value: value,
+      onChanged: (newValue) async {
+        setState(() {
+          value = newValue;
+        });
+        await onChanged(newValue);
+      },
     );
   }
 }

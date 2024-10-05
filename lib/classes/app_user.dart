@@ -41,7 +41,16 @@ class AppUser {
       return null;
     }
   }
-
+  // Method to update user by userId
+  static Future<void> updateAppUser(AppUser user, Database db) async {
+    await db.update(
+      'appUser',
+      user.toMap(),
+      where: 'userId = ?',  // Specify the condition to update by userId
+      whereArgs: [user.userId],
+    );
+    print("User updated successfully: ${user.userId}");
+  }
   // Function to insert an AppUser into the database
   static Future<void> insertAppUser(AppUser appUser, Database database) async {
     await database.insert('appUser', appUser.toMap());
@@ -59,4 +68,5 @@ class AppUser {
       'publicKey': publicKey,
     };
   }
+
 }

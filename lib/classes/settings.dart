@@ -10,6 +10,8 @@ class Settings {
   bool viaAPP = false;
   String voiceCmdActivate="";
   String voiceCmdCancel="";
+  List<int> userVoiceSample = [];
+
   // Secure Storage instance
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
@@ -24,6 +26,12 @@ class Settings {
     viaAPP = (await secureStorage.read(key: 'viaAPP')) == 'true';
   }
 
+  // Function to update and save the location permission setting
+  Future<void> setUserVoiceSample(List<int> value) async {
+    await secureStorage.write(key: 'userVoiceSample', value: '$value');
+    userVoiceSample = value;
+    print("isLocationPermission after update: $userVoiceSample");
+  }
   // Function to update and save the location permission setting
   Future<void> setIsLocationPermission(bool value) async {
     await secureStorage.write(key: 'isLocationPermission', value: '$value');

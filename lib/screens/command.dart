@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../fn/voice_command.dart';
-import '../fn/voice_recognition.dart';
 import 'settings.dart'; // Import the settings screen
 import '../classes/settings.dart';
-//import 'package:voice_authentication/voice_authentication.dart'; // Import the voice authentication package
 
 class CommandsScreen extends StatefulWidget {
   @override
@@ -18,7 +16,6 @@ class _CommandsScreenState extends State<CommandsScreen> {
   bool _isListeningForCancel = false;
   String _commandText = '';
   String _cancelCommandText = '';
-  bool _isVoiceRecognition = false;
 
   @override
   void initState() {
@@ -71,8 +68,8 @@ class _CommandsScreenState extends State<CommandsScreen> {
     } else {
       setState(() => _isListeningForCancel = false);
     }
-    print("command cancel voice: $_commandText");
-    setVoiceCmdCancel(_commandText);
+    print("command cancel voice: $_cancelCommandText");
+    setVoiceCmdCancel(_cancelCommandText);
   }
 
   void _stopListeningForCancel() {
@@ -106,20 +103,6 @@ class _CommandsScreenState extends State<CommandsScreen> {
             Text(
               'Voice Commands',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SwitchListTile(
-              title: Text('Allow voice recognition'),
-              value: _isVoiceRecognition,
-              onChanged: (newValueVoice) async {
-                setState(() {
-                  _isVoiceRecognition = newValueVoice;
-                });
-                await allowVoiceRecognition(newValueVoice);
-                if (newValueVoice) {
-                  // Add user to permitted list using voice authentication
-              //    await VoiceAuthentication().addUserToPermittedList();
-                }
-              },
             ),
             SizedBox(height: 20),
             Row(

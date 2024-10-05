@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/settings.dart';
+import 'screens/personal_data.dart';
+import 'screens/contacts.dart';
 
 class CustomFloatingActionButton extends FloatingActionButton {
   final VoidCallback onPressed;
@@ -16,10 +18,7 @@ class CustomFloatingActionButton extends FloatingActionButton {
     backgroundColor: backgroundColor,
     elevation: elevation,
     child: child,
-    // Set the desired height
   );
-
-// You can add any additional custom properties or methods here if needed
 }
 
 class MainPage extends StatelessWidget {
@@ -32,21 +31,41 @@ class MainPage extends StatelessWidget {
       body: Center(
         child: Text('Welcome to my app!'),
       ),
-      floatingActionButton: CustomFloatingActionButton(
-        onPressed: () {
-          // Navigate to the settings screen
-          Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen()));
-        },
-        backgroundColor: Colors.blue,
-        elevation: 9.0,
-        child: Icon(Icons.settings),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          CustomFloatingActionButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen()));
+            },
+            backgroundColor: Colors.blue,
+            elevation: 9.0,
+            child: Icon(Icons.settings),
+          ),
+          SizedBox(height: 16),
+          CustomFloatingActionButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PersonalDataScreen()));
+            },
+            backgroundColor: Colors.green,
+            elevation: 9.0,
+            child: Icon(Icons.person),
+          ),
+          SizedBox(height: 16),
+          CustomFloatingActionButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ContactsScreen()));
+            },
+            backgroundColor: Colors.orange,
+            elevation: 9.0,
+            child: Icon(Icons.contacts),
+          ),
+        ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
-
-
 
 void main() {
   runApp(MaterialApp(home: MainPage()));

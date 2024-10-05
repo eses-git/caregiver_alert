@@ -62,9 +62,9 @@ class AppDataBase {
           app_userId TEXT,
           number TEXT,
           publicKey TEXT,
-          app_appId TEXT,
-          FOREIGN KEY (app_appId) REFERENCES app(appId),
-          FOREIGN KEY (app_userId) REFERENCES appUser(userId)
+          app_id TEXT,
+          user_id TEXT,
+          app_appId TEXT
         )
       ''');
 
@@ -211,8 +211,8 @@ class AppDataBase {
 
   Future<void> insertIntoAlertStatusTable() async{
     final alertStatus1 = AppAlertStatus(
-      id: 1,
-      name: 'Active'
+        id: 1,
+        name: 'Active'
     );
     final alertStatus2 = AppAlertStatus(
         id: 2,
@@ -266,12 +266,12 @@ class AppDataBase {
     final viaAPP = await  secureStorage.write(key: 'viaAPP', value : 'false');
 
     final settings = AppSettings(
-        id: 1,
-        appUserId: '$userId',
-        appAppId: '$appId',
-        lastUpdate: DateTime.now(),
-        voiceCmdActivate: '',
-        voiceCmdCancel: '',
+      id: 1,
+      appUserId: '$userId',
+      appAppId: '$appId',
+      lastUpdate: DateTime.now(),
+      voiceCmdActivate: '',
+      voiceCmdCancel: '',
     );
     await AppSettings.insertAppSettings(settings, _database);
     print(" Data insered into Alert settings");
