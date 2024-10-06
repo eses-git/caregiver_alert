@@ -44,18 +44,13 @@ class InitialScreenDecider extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData) {
           if (!snapshot.data! || snapshot.data==false) {
-            // If agreement not accepted, show LanguageSelectionScreen
            return PrivacyPolicyScreen();
-            // return LanguageSelectionScreen();
           } else {
-            // If agreement accepted, show MainPage
             return MainPage();
           }
         } else {
           return PrivacyPolicyScreen();
-        //  print('5555555555555555');
-          // Default to LanguageSelectionScreen if unable to fetch preferences
-        //  return LanguageSelectionScreen();
+
         }
       },
     );

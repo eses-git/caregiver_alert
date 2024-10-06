@@ -12,14 +12,21 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 
 class AppDataBase {
-  late final Database _database;
+  late Database _database;
+  bool _isInitialized = false;
 
   // Singleton instance
   static final AppDataBase _instance = AppDataBase._internal();
   factory AppDataBase() => _instance;
   AppDataBase._internal();
 
-
+  // Ensure the database is initialized before accessing it
+  Future<Database> get database async {
+    if (!_isInitialized) {
+      await init();
+    }
+    return _database;
+  }
 
   Future<void> init() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -30,15 +37,29 @@ class AppDataBase {
       version: 1,
       onCreate: _createTables,
     );
+    _isInitialized = true; // Mark as initialized
+    await _printTableNames();
     await _printTableNames();
     await insertIntoAppTable();
     await insertIntoUserTable();
     await insertIntoAlertStatusTable();
     await insertIntoAppAlertType();
     await insertIntoAppSettings();
-
   }
-  Database get database => _database;
+
+  Future<void> _printTableValues() async {
+    final List<Map<String, dynamic>> tables = await _database.rawQuery(
+      "SELECT name FROM sqlite_master WHERE type='table'",
+    );
+
+    final tableNames = tables.map((row) => row['name'] as String).toList();
+
+    print('Tables in the database:');
+    for (final tableName in tableNames) {
+      print('- $tableName');
+    }
+  }
+
   Future<void> _createTables(Database db, int version) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS app (
@@ -150,6 +171,7 @@ class AppDataBase {
         )
       ''');
     // Add their creation statements here...
+
   }
 
   Future<void> _printTableNames() async {

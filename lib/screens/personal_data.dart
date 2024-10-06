@@ -33,13 +33,12 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
       // Retrieve the user data
       AppUser? user = await AppUser.getAppUserById(userId, database);
 
-
       // If user data is not null, update the text controllers
       if (user != null) {
         setState(() {
-          _nameController.text = user.name;
-          _emailController.text = user.email;
-          _phoneController.text = user.phone;
+          _nameController.text = user.name ?? '';  // If user.name is null, set it to an empty string
+          _emailController.text = user.email ?? ''; // If user.email is null, set it to an empty string
+          _phoneController.text = user.phone ?? ''; // If user.phone is null, set it to an empty string
         });
       }
     } else {
@@ -52,7 +51,6 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
     if (_formKey.currentState!.validate()) {
       // Access the already initialized database
       Database database = await AppDataBase().database;
-
       final secureStorage = FlutterSecureStorage();
       final userId = await secureStorage.read(key: 'userId');
 
@@ -72,8 +70,8 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
             publicKey: user.publicKey,        // Keep original public key
           );
 
-          // Update the user record in the database
           await AppUser.updateAppUser(user, database);
+
 
           // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
