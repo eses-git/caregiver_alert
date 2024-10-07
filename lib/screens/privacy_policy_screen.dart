@@ -29,6 +29,8 @@ class PrivacyPolicyScreen extends StatelessWidget {
               onPressed: () async {
                // await _initializeDatabase();
                 await _setAgreementStatus(true);
+                await init();
+                print("iniiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiit");
                 Navigator.pushNamed(context, '/');
 
               },
@@ -51,10 +53,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   Future<void> _setAgreementStatus(status) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print("status--------- $status");
-    if(status==true){
-      print("status true");
-      await init();
-    }
+
     await prefs.setBool('agreedToPrivacyPolicy', status);
   }
 }

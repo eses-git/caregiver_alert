@@ -39,12 +39,22 @@ class AppDataBase {
     );
     _isInitialized = true; // Mark as initialized
     await _printTableNames();
-    await _printTableNames();
-    await insertIntoAppTable();
-    await insertIntoUserTable();
-    await insertIntoAlertStatusTable();
-    await insertIntoAppAlertType();
-    await insertIntoAppSettings();
+    // Only insert data if the app table is empty
+    final bool appTableIsEmpty = await _isAppTableEmpty();
+    if (appTableIsEmpty) {
+      await insertIntoAppTable();
+      await insertIntoUserTable();
+      await insertIntoAlertStatusTable();
+      await insertIntoAppAlertType();
+      await insertIntoAppSettings();
+    }
+  }
+
+
+  Future<bool> _isAppTableEmpty() async {
+    final List<Map<String, dynamic>> result = await _database.rawQuery('SELECT COUNT(*) FROM app');
+    int count = Sqflite.firstIntValue(result) ?? 0;
+    return count == 0;
   }
 
   Future<void> _printTableValues() async {
